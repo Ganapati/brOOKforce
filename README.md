@@ -49,11 +49,11 @@ Usage example
 
 Binary injection :
 ```
-~/s/brOOKforce ❯❯❯ sudo python ./brOOKforce.py --message "#CHECKSUM#001??00111" --charset "01" -v
-MESSAGE : 'Hp' (10010001110000)
-MESSAGE : 'Jp' (10010101110000)
-MESSAGE : 'Lp' (10011001110000)
-MESSAGE : 'Np' (10011101110000)
+~/s/brOOKforce ❯❯❯ sudo python ./brOOKforce.py --message "#CHECKSUM#001??00111" --charset "01" -v  ⏎
+MESSAGE : 'Hp' (010010000111)
+MESSAGE : 'Jp' (010010100111)
+MESSAGE : 'Lp' (010011000111)
+MESSAGE : 'Np' (010011100111)
 ```
 
 Non Binary injection :

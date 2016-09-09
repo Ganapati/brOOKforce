@@ -29,9 +29,7 @@ class Brookforce(object):
             d.makePktFLEN(len(preamble))
             d.RFxmit(preamble)
             d.makePktFLEN(len(message))
-
-            if self.verbose:
-                print 'MESSAGE : %s (%s)' % (repr(message), ''.join(format(ord(x), 'b') for x in message))
+                
             for i in range(self.repeat):
                 d.RFxmit(message)
                
@@ -55,10 +53,17 @@ class Brookforce(object):
                 else:
                     print("Warning, checksum in message, but no checksum method defined")
                     final_message = final_message.replace("#CHECKSUM#", "")
+            
             if all(c in '01' for c in final_message):
-                yield bitstring.BitArray(bin=final_message).tobytes()
+                binary_message = final_message
+                final_message = bitstring.BitArray(bin=final_message).tobytes()
+                if self.verbose:
+                    print 'MESSAGE : %s (%s)' % (repr(final_message), binary_message)
             else:
-                yield final_message
+                if self.verbose:
+                    print 'MESSAGE : %s (%s)' % (repr(final_message), ''.join(format(ord(x), 'b') for x in final_message))
+            
+            yield final_message
 
 if __name__ == "__main__":
     """ Test method (example)
