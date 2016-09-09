@@ -3,11 +3,20 @@ Usage
 
  - Add "?" char in message where you want to bruteforce bits
  - Add "#CHECKSUM#" in message where you want to insert the generated checksum
+ - Support Raw or Binary message
 
- Example : 
+Example Binary: 
 ```
  1111100001010????11010#CHECKSUM#
 ```
+
+Example Raw:
+```
+ FOOBAR????11010#CHECKSUM#
+```
+
+
+
 
 Custom checksum
 ---------------
@@ -27,29 +36,31 @@ bf = Brookforce(frequency=433000000,
                 message="1100????#CHECKSUM#", 
                 preamble="11110000",
                 repeat=2,
+                charset="01"
                 checksum=simple_crc)
 
 bf.emit()
 ```
 
 Usage example
------------
+-------------
+
+(Static checksum, always return "01")
+
+Binary injection :
 ```
->>> sudo python ./brOOKforce.py -m "1111????#CHECKSUM#" -v
-MESSAGE : 1111000011110000
-MESSAGE : 1111000111110001
-MESSAGE : 1111001011110010
-MESSAGE : 1111001111110011
-MESSAGE : 1111010011110100
-MESSAGE : 1111010111110101
-MESSAGE : 1111011011110110
-MESSAGE : 1111011111110111
-MESSAGE : 1111100011111000
-MESSAGE : 1111100111111001
-MESSAGE : 1111101011111010
-MESSAGE : 1111101111111011
-MESSAGE : 1111110011111100
-MESSAGE : 1111110111111101
-MESSAGE : 1111111011111110
-MESSAGE : 1111111111111111
+~/s/brOOKforce ❯❯❯ sudo python ./brOOKforce.py --message "#CHECKSUM#001??00111" --charset "01" -v
+MESSAGE : 'Hp' (10010001110000)
+MESSAGE : 'Jp' (10010101110000)
+MESSAGE : 'Lp' (10011001110000)
+MESSAGE : 'Np' (10011101110000)
+```
+
+Non Binary injection :
+```
+~/s/brOOKforce ❯❯❯ sudo python ./brOOKforce.py --message "#CHECKSUM#AB??EF" --charset "CD" -v
+MESSAGE : '01ABCCEF' (110000110001100000110000101000011100001110001011000110)
+MESSAGE : '01ABCDEF' (110000110001100000110000101000011100010010001011000110)
+MESSAGE : '01ABDCEF' (110000110001100000110000101000100100001110001011000110)
+MESSAGE : '01ABDDEF' (110000110001100000110000101000100100010010001011000110)
 ```
