@@ -1,8 +1,8 @@
 Usage
 -----
 
- - Add "?" char in message where you want to bruteforce bits
- - Add "#CHECKSUM#" in message where you want to insert the generated checksum
+ - Add "?" char in message where you want to bruteforce bits or char
+ - If checksum is needed, add "#CHECKSUM#" in message where you want to insert the generated value and defined a checksum function
  - Support Raw or Binary message
 
 Example Binary: 
