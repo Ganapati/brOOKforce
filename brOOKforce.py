@@ -30,8 +30,7 @@ class Brookforce(object):
             d.makePktFLEN(len(message))
             
             if self.verbose:
-                print 'MESSAGE : %s%s' % (''.join(format(ord(x), 'b') for x in preamble), 
-                                          ''.join(format(ord(x), 'b') for x in message))
+                print 'MESSAGE : %s' % ''.join(format(ord(x), 'b') for x in message)
             for i in range(self.repeat):
                 d.RFxmit(message)
                
@@ -70,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbose', help='verbose mode', action="store_true")
 
     args = vars(parser.parse_args())
-    
+
     def simple_crc(message):
         # xor all bytes (before #CHECKSUM#)
         message = bitstring.BitArray(bin=message[:-10]).tobytes()
