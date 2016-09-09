@@ -59,7 +59,7 @@ class Brookforce(object):
                     print 'MESSAGE : %s (%s)' % (repr(final_message), binary_message)
             else:
                 if self.verbose:
-                    print 'MESSAGE : %s (%s)' % (repr(final_message), ''.join(format(ord(x), 'b') for x in final_message))
+                    print 'MESSAGE : %s (%s)' % (repr(final_message), ''.join([ bin(ord(ch))[2:].zfill(8) for ch in final_message ]))
             
             yield final_message
 
