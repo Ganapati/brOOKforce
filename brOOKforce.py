@@ -16,29 +16,28 @@ class Brookforce(object):
         self.charset = charset
 
     def emit(self):
-        """
+
         d = RfCat()
         d.setMdmModulation(MOD_ASK_OOK)
         d.setFreq(self.frequency)
         d.setMaxPower()
         d.setMdmDRate(self.rate)
-        """
+
         preamble = self.build_preamble()
         for message in self.build_message():
-            """
+
             d.makePktFLEN(len(preamble))
             d.RFxmit(preamble)
             d.makePktFLEN(len(message))
-            """
+
             if self.verbose:
                 print 'MESSAGE : %s (%s)' % (repr(message), ''.join(format(ord(x), 'b') for x in message))
             for i in range(self.repeat):
-                #d.RFxmit(message)
-                pass
+                d.RFxmit(message)
                
             time.sleep(0.001)
 
-        #d.setModeIDLE()
+        d.setModeIDLE()
 
     def build_preamble(self):
         return bitstring.BitArray(bin=self.preamble).tobytes()
