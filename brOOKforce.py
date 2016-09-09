@@ -33,8 +33,6 @@ class Brookforce(object):
             for i in range(self.repeat):
                 d.RFxmit(message)
                
-            time.sleep(0.001)
-
         d.setModeIDLE()
 
     def build_preamble(self):
