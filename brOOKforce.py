@@ -5,8 +5,8 @@ import argparse
 import itertools
 
 class Brookforce(object):
-    def __init__(self, freq=None, rate=None, preamble=None, message=None, repeat=1, checksum=None, verbose=False):
-        self.freq = freq
+    def __init__(self, frequency=None, rate=None, preamble=None, message=None, repeat=1, checksum=None, verbose=False):
+        self.frequency = frequency
         self.rate = rate
         self.verbose = verbose
         self.preamble = preamble
@@ -18,7 +18,7 @@ class Brookforce(object):
         
         d = RfCat()
         d.setMdmModulation(MOD_ASK_OOK)
-        d.setFreq(self.freq)
+        d.setFreq(self.frequency)
         d.setMaxPower()
         d.setMdmDRate(self.rate)
         
@@ -70,44 +70,21 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbose', help='verbose mode', action="store_true")
 
     args = vars(parser.parse_args())
+    
+    def simple_crc(message):
+        # xor all bytes (before #CHECKSUM#)
+        message = bitstring.BitArray(bin=message[:-10]).tobytes()
+        crc = "\x00"
+        for _ in message:
+            crc = chr(ord(crc)^ord(_))
+        return ''.join(format(ord(x), 'b') for x in crc)
 
-    if args['message'] is None:
-        print """
-            Usage : 
-             - Add "?" char in message where you want to bruteforce bits
-             - Add "#CHECKSUM#" in message where you want to insert the generated checksum
-             Ex : 1111100001010????#CHECKSUM#
-
-             set the checksum arg to a custom function ex : 
-
-             def simple_crc(message):
-                # xor all bytes (before #CHECKSUM#)
-                message = bitstring.BitArray(bin=message[:-10]).tobytes()
-                crc = "\x00"
-                for _ in message:
-                    crc = chr(ord(crc)^ord(_))
-                return ''.join(format(ord(x), 'b') for x in crc)
-
-            bf = Brookforce(blablabla frequency and stuff)
-            bf.checksum = simple_crc
-            bf.emit()
-            """
-    else:
-        bf = Brookforce(preamble=args['preamble'], 
-                        message=args['message'],
-                        freq=args['frequency'],
-                        rate=args['rate'],
-                        repeat=args['repeat'],
-                        verbose=args['verbose'])
-
-        def simple_crc(message):
-            # xor all bytes (before #CHECKSUM#)
-            message = bitstring.BitArray(bin=message[:-10]).tobytes()
-            crc = "\x00"
-            for _ in message:
-                crc = chr(ord(crc)^ord(_))
-            return ''.join(format(ord(x), 'b') for x in crc)
-
-        bf.checksum = simple_crc
-        
-        bf.emit()
+    bf = Brookforce(preamble=args['preamble'], 
+                    message=args['message'],
+                    frequency=args['frequency'],
+                    rate=args['rate'],
+                    repeat=args['repeat'],
+                    verbose=args['verbose'],
+                    checksum=simple_crc)
+    
+    bf.emit()
