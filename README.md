@@ -6,7 +6,7 @@ Usage
 
  Example : 
 ```
- 1111100001010????#CHECKSUM#
+ 1111100001010????11010#CHECKSUM#
 ```
 
 Custom checksum
@@ -28,11 +28,11 @@ bf = Brookforce(frequency=433000000,
                 preamble="11110000",
                 repeat=2,
                 checksum=simple_crc)
-                
+
 bf.emit()
 ```
 
-Use example
+Usage example
 -----------
 ```
 >>> sudo python ./brOOKforce.py -m "1111????#CHECKSUM#" -v
