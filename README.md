@@ -5,18 +5,51 @@ Usage
  - If checksum is needed, add "#CHECKSUM#" in message where you want to insert the generated value and defined a checksum function
  - Support Raw or Binary message
 
-Example Binary: 
+Examples
+--------
+(Static checksum, always return 01)
+
+Binary: 
 ```
- 1111100001010????11010#CHECKSUM#
+>>> sudo python ./brOOKforce.py -m "#CHECKSUM#01??10010111010" -c "01" -v
+
+MESSAGE : 'RK\xa0'
+MESSAGE : 'R\xcb\xa0'
+MESSAGE : 'SK\xa0'
+MESSAGE : 'S\xcb\xa0'
 ```
 
-Example Raw:
+Ascii:
 ```
- FOOBAR????11010#CHECKSUM#
+>>> sudo python ./brOOKforce.py -m "#CHECKSUM#FOO??RBAZ" -c "AR" -v
+
+MESSAGE : '01FOOAARBAZ'
+MESSAGE : '01FOOARRBAZ'
+MESSAGE : '01FOORARBAZ'
+MESSAGE : '01FOORRRBAZ'
 ```
 
+Raw
+```
+>>> sudo python ./brOOKforce.py -m "#CHECKSUM#\x02\x0?\xff\xff\xff\xff" -c "0123456789abcdef" -v
 
-
+MESSAGE : '01\x02\x00\xff\xff\xff\xff'
+MESSAGE : '01\x02\x01\xff\xff\xff\xff'
+MESSAGE : '01\x02\x02\xff\xff\xff\xff'
+MESSAGE : '01\x02\x03\xff\xff\xff\xff'
+MESSAGE : '01\x02\x04\xff\xff\xff\xff'
+MESSAGE : '01\x02\x05\xff\xff\xff\xff'
+MESSAGE : '01\x02\x06\xff\xff\xff\xff'
+MESSAGE : '01\x02\x07\xff\xff\xff\xff'
+MESSAGE : '01\x02\x08\xff\xff\xff\xff'
+MESSAGE : '01\x02\t\xff\xff\xff\xff'
+MESSAGE : '01\x02\n\xff\xff\xff\xff'
+MESSAGE : '01\x02\x0b\xff\xff\xff\xff'
+MESSAGE : '01\x02\x0c\xff\xff\xff\xff'
+MESSAGE : '01\x02\r\xff\xff\xff\xff'
+MESSAGE : '01\x02\x0e\xff\xff\xff\xff'
+MESSAGE : '01\x02\x0f\xff\xff\xff\xff'
+```
 
 Custom checksum
 ---------------
@@ -25,11 +58,11 @@ from brOOKforce import Brookforce
 
 def simple_crc(message):
     # xor all bytes (before #CHECKSUM#)
-    message = bitstring.BitArray(bin=message[:-10]).tobytes()
+    payload = message[:-10]
     crc = "\x00"
-    for _ in message:
+    for _ in payload:
         crc = chr(ord(crc)^ord(_))
-    return ''.join(format(ord(x), 'b') for x in crc)
+    return crc
 
 bf = Brookforce(frequency=433000000, 
                 rate=25000, 
@@ -40,27 +73,4 @@ bf = Brookforce(frequency=433000000,
                 checksum=simple_crc)
 
 bf.emit()
-```
-
-Usage example
--------------
-
-(Static checksum, always return "01")
-
-Binary injection :
-```
-~/s/brOOKforce ❯❯❯ sudo python ./brOOKforce.py --message "#CHECKSUM#001??00111" --charset "01" -v  ⏎
-MESSAGE : 'Hp' (010010000111)
-MESSAGE : 'Jp' (010010100111)
-MESSAGE : 'Lp' (010011000111)
-MESSAGE : 'Np' (010011100111)
-```
-
-Non Binary injection :
-```
-~/s/brOOKforce ❯❯❯ sudo python ./brOOKforce.py --message "#CHECKSUM#AB??EF" --charset "CD" -v
-MESSAGE : '01ABCCEF' (110000110001100000110000101000011100001110001011000110)
-MESSAGE : '01ABCDEF' (110000110001100000110000101000011100010010001011000110)
-MESSAGE : '01ABDCEF' (110000110001100000110000101000100100001110001011000110)
-MESSAGE : '01ABDDEF' (110000110001100000110000101000100100010010001011000110)
 ```
