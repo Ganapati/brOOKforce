@@ -11,9 +11,10 @@ class Brookforce(object):
         self.verbose = verbose
         self.preamble = preamble
         self.message = message
+
         self.checksum = checksum
         self.repeat = repeat
-        self.charset = charset
+        self.charset = charset.decode('string_escape')
 
     def emit(self):
 
@@ -23,43 +24,45 @@ class Brookforce(object):
         d.setMaxPower()
         d.setMdmDRate(self.rate)
 
-        preamble = self.build_preamble()
-        for message in self.build_message():
+        if self.preamble is not None:
+            preamble = self.build_preamble()
 
-            d.makePktFLEN(len(preamble))
-            d.RFxmit(preamble)
-            d.makePktFLEN(len(message))
-                
-            for i in range(self.repeat):
+        for message in self.build_message():
+            if all(c in '01' for c in message):
+                message = bitstring.BitArray(bin=message).tobytes()
+
+            if self.verbose:
+                print('MESSAGE : %s' % (repr(message)))
+
+            if self.preamble is not None:
+                d.makePktFLEN(len(preamble))
+                d.RFxmit(preamble)
+            
+            d.makePktFLEN(len(message))    
+            for i in xrange(self.repeat):
                 d.RFxmit(message)
                
         d.setModeIDLE()
 
     def build_preamble(self):
-        return bitstring.BitArray(bin=self.preamble).tobytes()
+        if all(c in '01' for c in self.preamble):
+            return bitstring.BitArray(bin=self.preamble).tobytes()
+        else:
+            return self.preamble
 
     def build_message(self):
         frmt_message = self.message.replace("?", "%s")
         nb_bf = frmt_message.count("%s")
+
         for combination in itertools.product(self.charset, repeat=nb_bf):
             final_message = frmt_message % combination
-            
+            final_message = final_message.decode('string_escape')
             if "#CHECKSUM#" in self.message:
                 if self.checksum is not None:
                     checksum = self.checksum(final_message)
                     final_message = final_message.replace("#CHECKSUM#", checksum)
                 else:
-                    print("Warning, checksum in message, but no checksum method defined")
-                    final_message = final_message.replace("#CHECKSUM#", "")
-            
-            if all(c in '01' for c in final_message):
-                binary_message = final_message
-                final_message = bitstring.BitArray(bin=final_message).tobytes()
-                if self.verbose:
-                    print 'MESSAGE : %s (%s)' % (repr(final_message), binary_message)
-            else:
-                if self.verbose:
-                    print 'MESSAGE : %s (%s)' % (repr(final_message), ''.join([ bin(ord(ch))[2:].zfill(8) for ch in final_message ]))
+                    raise Exception("Warning, checksum in message, but no checksum method defined")
             
             yield final_message
 
@@ -67,9 +70,9 @@ if __name__ == "__main__":
     """ Test method (example)
     """
     parser=argparse.ArgumentParser(description="Bruteforce OOK/ASK")
-    parser.add_argument('-p', '--preamble', help='message preamble', default="")
+    parser.add_argument('-p', '--preamble', help='message preamble', default=None)
     parser.add_argument('-c', '--charset', help='bruteforce charset', default="01")
-    parser.add_argument('-m', '--message', help='message', default=None)
+    parser.add_argument('-m', '--message', help='raw message', required=True)
     parser.add_argument('-f', '--frequency', help='frequency', default=433000000, type=int)
     parser.add_argument('-r', '--rate', help='rate', default=2500, type=int)
     parser.add_argument('-x', '--repeat', help='repeat', default=1, type=int)
@@ -78,7 +81,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     def simple_crc(message):
-        return "01" # static crc, write your own here !
+        return "11110000" # static crc, write your own here !
 
     bf = Brookforce(preamble=args['preamble'], 
                     message=args['message'],
