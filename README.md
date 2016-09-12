@@ -13,20 +13,20 @@ Binary:
 ```
 >>> sudo python ./brOOKforce.py -m "#CHECKSUM#01??10010111010" -c "01" -v
 
-MESSAGE : 'RK\xa0'
-MESSAGE : 'R\xcb\xa0'
-MESSAGE : 'SK\xa0'
-MESSAGE : 'S\xcb\xa0'
+MESSAGE : 'R]\x00'
+MESSAGE : 'V]\x00'
+MESSAGE : 'Z]\x00'
+MESSAGE : '^]\x00'
 ```
 
 Ascii:
 ```
->>> sudo python ./brOOKforce.py -m "#CHECKSUM#FOO??RBAZ" -c "AR" -v
+>>> sudo python ./brOOKforce.py -m "#CHECKSUM#FOOB??RBAZ" -c "AR" -v
 
-MESSAGE : '01FOOAARBAZ'
-MESSAGE : '01FOOARRBAZ'
-MESSAGE : '01FOORARBAZ'
-MESSAGE : '01FOORRRBAZ'
+MESSAGE : '01FOOBAARBAZ'
+MESSAGE : '01FOOBARRBAZ'
+MESSAGE : '01FOOBRARBAZ'
+MESSAGE : '01FOOBRRRBAZ'
 ```
 
 Raw

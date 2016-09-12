@@ -81,7 +81,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     def simple_crc(message):
-        return "11110000" # static crc, write your own here !
+        return "01" # static crc, write your own here !
 
     bf = Brookforce(preamble=args['preamble'], 
                     message=args['message'],
